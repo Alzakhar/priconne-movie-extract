@@ -6,9 +6,12 @@
  * @param {string}    export_path    PATH TO EXPORT THE .db FILE TO
  * @return {Promise<any>}
  */
-function deserialize_unity3d(import_path, export_path) {
+function deserialize_unity3d(import_path, export_path, second_export = "") {
     const py_file = 'python-tools/deserialize.py',
-        options = { args: [import_path, export_path] };
+        options = { 
+            pythonPath: "python3.8", // NOTE: I had to do this because decrunch was not working on python 3.9
+            args: [import_path, export_path, second_export] 
+        };
     return run_python(py_file, options);
 }
 
@@ -25,7 +28,7 @@ function run_python(py_file, options, silent = false) {
         const { PythonShell } = require('python-shell');
         await PythonShell.run(py_file, options, function(err, results) {
             if (err) throw err;
-            if (!silent) {
+            if (!silent && results) {
                 for (let i of results) {
                     console.log('[' + py_file + ']', i);
                 }

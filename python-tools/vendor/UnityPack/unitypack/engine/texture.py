@@ -68,6 +68,8 @@ class TextureFormat(IntEnum):
 	def pixel_format(self):
 		if self == TextureFormat.RGB24:
 			return "RGB"
+		elif self == TextureFormat.ETC2_RGB:
+			return "RGB"
 		elif self == TextureFormat.ARGB32:
 			return "ARGB"
 		elif self == TextureFormat.RGB565:
@@ -94,6 +96,8 @@ IMPLEMENTED_FORMATS = (
 	TextureFormat.DXT5,
 	TextureFormat.DXT5Crunched,
 	TextureFormat.BC7,
+	TextureFormat.ETC2_RGBA8,
+	TextureFormat.ETC2_RGB
 )
 
 
@@ -158,6 +162,7 @@ class Texture2D(Texture):
 	def image(self):
 		from PIL import Image
 		from decrunch import File as CrunchFile
+		import etcpack
 
 		if self.format not in IMPLEMENTED_FORMATS:
 			raise NotImplementedError("Unimplemented format %r" % (self.format))
@@ -171,6 +176,12 @@ class Texture2D(Texture):
 		elif self.format == TextureFormat.BC7:
 			codec = "bcn"
 			args = (7, )
+		elif self.format == TextureFormat.ETC2_RGBA8:
+			codec = "etc2"
+			args = (3, )
+		elif self.format == TextureFormat.ETC2_RGB:
+			codec = "etc2"
+			args = (1, )
 		else:
 			codec = "raw"
 			args = (self.format.pixel_format, )
