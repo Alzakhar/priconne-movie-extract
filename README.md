@@ -1,33 +1,26 @@
-# priconne-en_db-fetch<br>Princess Connect Re:Dive (English Version) - Database Fetcher
+# priconne-cdn-extract<br>Princess Connect Re:Dive - Data download and extraction tool
 
-## Welcome!
-This was made possible due to a collaborative effort with `jmvr#6264`.
-
-I am making this a public repository as `esterTion`'s website hasn't included `priconne-en` in their API.<br>
-*This is intended as a resource for anyone interested in datamining `Princess Connect Re:Dive`'s English server.*
-
-## Information
-`priconne-en_db-fetch` is a stripped down version of [pqh-updater](https://github.com/Expugn/pqh-updater), so it is written using JavaScript (Node.js) and Python.
-
-This has been written while using `Windows 10`, directory paths may differ if using different operating systems.
-
-Image datamining is not included as images can be found through other sources. ***THIS ONLY GETS THE MASTER DATABASE FILE.***
-
-## Notes
-The difference between `priconne-en` and `priconne-jp` so far is that the .unity3d file that holds the master database is **NOT** encrypted.<br>
-**IT IS POSSIBLE THAT IN THE FUTURE THAT THIS WILL CHANGE. WHEN IT DOES, THIS CODE WILL BREAK.**
-
-I can not guarantee that the TruthVersion guessing system will work flawlessly.<br>
-**IF TruthVersions ARE INCREMENTED DIFFERENTLY THAN EXPECTED, THIS CODE WILL BREAK.**
-
-If you are interested in image datamining, please review [pqh-updater](https://github.com/Expugn/pqh-updater).<br>
-**`UnityPack` MAY NOT HAVE THE ABILITY TO DESERIALIZE THE IMAGES AS IT MIGHT NOT SUPPORT THE FORMAT IMAGES ARE SAVED IN.**
+This is a tool for downloading data from PriConne's CDN and decrypting/extracting it into a workable format. 
+This is built on work by [S'pugn](https://github.com/Expugn/priconne-en_db-fetch), which was built on work by [esterTion](https://redive.estertion.win/).
+The main differences are that this tool was not built specifically for Priconne Quest Helper, and it keeps old versions of files around so you can see the complete history.
 
 ## Requirements
 #### System
 Node.js `v11.15.0` or above<br>
 Python 3
 
-#### python-tools/deserialize.py
+#### Python packages
 - **lz4** `pip install lz4`
+- **Pillow** `pip install Pillow`
+- **decrunch** `pip install decrunch`
 - **UnityPack** (provided) [GitHub](https://github.com/HearthSim/UnityPack)
+- **Pillow** `pip install Pillow`
+
+## Use
+
+This tool is broken into three stages, which should be run in order. They are broken up so you don't have to run the whole script every time.
+
+ * *check* - Check for manifest updates to see if there is anything that needs to be downloaded.
+ * *download* - Download any new updated files.
+ * *extract* - Convert unity3d files into usable images and text.
+
