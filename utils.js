@@ -8,6 +8,18 @@ function parseManifestLine(line) {
     }
 }
 
+const cdnHosts = {
+    "en": "assets-priconne-redive-us.akamaized.net",
+    "jp": "prd-priconne-redive.akamaized.net"
+}
+
+const defaultVersion = {
+    "en": 10000000,
+    "jp": 10010800
+}
+
 module.exports = {
-	parseManifestLine
+	parseManifestLine,
+	cdnHosts,
+	defaultVersion
 }

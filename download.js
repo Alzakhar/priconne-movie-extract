@@ -2,21 +2,21 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 
-const output_dir = "out";
-const cdnHosts = {
-    "en": "assets-priconne-redive-us.akamaized.net",
-    "jp": "prd-priconne-redive.akamaized.net"
-}
+const config = require('./config');
+const utils = require('./utils');
 
-run();
+config.servers.forEach(function(server) {
+    run(server);
+});
 
 function run(server = "en") {
-    const server_out_dir = path.join(output_dir, server);
+    const server_out_dir = path.join(config.outDir, server);
     fs.readdirSync(server_out_dir, { withFileTypes: true })
         .filter(function(path) {
             return path.isDirectory();
         })
         .forEach(async function(manifestPath) {
+            if (config.includeManifests.indexOf(manifestPath.name) === -1) return;
             const manifest_dir = path.join(server_out_dir, manifestPath.name);
             const asset_version_file = path.join(manifest_dir, 'asset-versions.json');
             const asset_version_info = JSON.parse(fs.readFileSync(asset_version_file, 'utf8'));
@@ -35,7 +35,7 @@ function run(server = "en") {
                     }
                     let versionFilePath = path.join(versionPath, filePath);
                     if (!fs.existsSync(versionFilePath)) {
-                        console.log("DOWNLOADING " + versionFilePath);
+                        console.log("[[" + server + "]] DOWNLOADING " + versionFilePath);
                         let type = "asset";
                         if (manifestPath.name === "sound") {
                             type = "sound";
@@ -53,12 +53,12 @@ function run(server = "en") {
                             }
                         }
                         else {
-                            console.log("UNABLE TO DOWNLOAD " + versionFilePath);
+                            console.log("[[" + server + "]] UNABLE TO DOWNLOAD " + versionFilePath);
                         }
                     }
                 }
             }
-            console.log("DONE DOWNLOADING " + manifestPath.name)
+            console.log("[[" + server + "]] DONE DOWNLOADING " + manifestPath.name)
         });
 }
 
@@ -67,7 +67,7 @@ function downloadManifest(manifestPath) {
 }
 
 function fetchAsset(hash, server, type = "asset") {
-    const host = cdnHosts[server];
+    const host = utils.cdnHosts[server];
     let path = '/dl/pool/AssetBundles/' + hash.substr(0, 2) + '/' + hash;
     if (type === "sound") {
         path = '/dl/pool/Sound/' + hash.substr(0, 2) + '/' + hash;
@@ -82,5 +82,8 @@ function fetchAsset(hash, server, type = "asset") {
         else {
             return null;
         }
+    }).catch(function(error) {
+        console.log(error);
+        return null;
     });
 }

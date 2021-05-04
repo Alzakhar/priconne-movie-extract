@@ -2,22 +2,16 @@ const fetch = require('node-fetch');
 const fs = require('fs');
 const path = require('path');
 
+const config = require('./config');
 const utils = require('./utils');
 
-const output_dir = "out";
-const _max_test_amount = 20;
-
-const cdnHosts = {
-    "en": "assets-priconne-redive-us.akamaized.net",
-    "jp": "prd-priconne-redive.akamaized.net"
-}
-const default_version = 10000000;
-
-run();
+config.servers.forEach(function(server) {
+    run(server);
+});
 
 function run(server = "en") {
     // CHECK IF DATABASE DIRECTORY EXISTS
-    const server_out_dir = path.join(output_dir, server);
+    const server_out_dir = path.join(config.outDir, server);
     if (!fs.existsSync(server_out_dir)) {
         fs.mkdirSync(server_out_dir, { recursive: true });
     }
@@ -26,7 +20,7 @@ function run(server = "en") {
         for (var manifestFile in versionConfig.files) {
             let manifestName = manifestFile.replace("manifest/", "").replace("_assetmanifest", "").replace("soundmanifest", "sound");
             let assetVersions = checkAssetVersions(manifestName, versionConfig.files[manifestFile].versions, server);
-            console.log("DONE WITH " + manifestFile)
+            console.log("[[" + server + "]] DONE WITH " + manifestFile)
         }
     })();
 }
@@ -35,22 +29,22 @@ function checkTruthVersions(server) {
     return new Promise(function(resolve) {
         // READ CURRENT DATABASE VERSION
         let version_info;
-        const version_file = path.join(output_dir, server, 'versions.json');
+        const version_file = path.join(config.outDir, server, 'versions.json');
         if (fs.existsSync(version_file)) {
             // DATABASE VERSION FILE EXISTS
             version_info = JSON.parse(fs.readFileSync(version_file, 'utf8'));
-            console.log('EXISTING VERSION FILE FOUND: LATEST VERSION =', version_info['latestVersion']);
+            console.log("[[" + server + ']] EXISTING VERSION FILE FOUND: LATEST VERSION =', version_info['latestVersion']);
         }
         else {
             // DATABASE VERSION FILE DOES NOT EXIST, START FROM SCRATCH
             version_info = {
-                latestVersion: default_version,
+                latestVersion: utils.defaultVersion[server],
                 files: {}
             };
-            console.log('VERSION FILE NOT FOUND. STARTING FROM ' + default_version);
+            console.log("[[" + server + ']] VERSION FILE NOT FOUND. STARTING FROM ' + utils.defaultVersion[server]);
         }
 
-        console.log('CHECKING FOR NEW DATA...');
+        console.log("[[" + server + ']] CHECKING FOR NEW DATA...');
         (async () => {
             // FIND NEW TRUTH VERSION
             const test_increment = 10;
@@ -58,10 +52,10 @@ function checkTruthVersions(server) {
             let numGuesses = 0;
             do {
                 numGuesses++;
-                console.log('[GUESS]'.padEnd(10), guess, '(' + numGuesses + '/' + _max_test_amount + ')');
+                console.log("[[" + server + ']] [GUESS]'.padEnd(20), guess, '(' + numGuesses + '/' + config.maxChecks + ')');
                 const res = await fetchManifest(guess, "manifest", server);
                 if (res) {
-                    console.log('[SUCCESS]'.padEnd(10), guess, ' RETURNED STATUS CODE 200 (VALID TRUTH VERSION)');
+                    console.log("[[" + server + ']] [SUCCESS]'.padEnd(20), guess, ' RETURNED STATUS CODE 200 (VALID TRUTH VERSION)');
                     version_info.latestVersion = guess;
                     version_info.latestDate = res.date;
                     res.body.split('\n').forEach(function(manifestLine) {
@@ -88,7 +82,7 @@ function checkTruthVersions(server) {
                 }
 
                 guess += test_increment;
-            } while (numGuesses < _max_test_amount);
+            } while (numGuesses < config.maxChecks);
 
             fs.writeFile(version_file, JSON.stringify(version_info, null, "\t"), function (err) {
                 if (err) throw err;
@@ -104,7 +98,7 @@ function checkAssetVersions(manifest, versions, server) {
     return new Promise(function(resolve) {
         // READ CURRENT DATABASE VERSION
         let asset_version_info;
-        const manifest_dir = path.join(output_dir, server, manifest)
+        const manifest_dir = path.join(config.outDir, server, manifest)
         if (!fs.existsSync(manifest_dir)) {
             fs.mkdirSync(manifest_dir, { recursive: true });
         }
@@ -114,7 +108,7 @@ function checkAssetVersions(manifest, versions, server) {
         }
         else {
             asset_version_info = {
-                latestVersion: default_version,
+                latestVersion: utils.defaultVersion[server],
                 files: {}
             };
         }
@@ -124,7 +118,7 @@ function checkAssetVersions(manifest, versions, server) {
             for (var i = 0; i < truthVersions.length; i++) {
                 let version = truthVersions[i];
                 if ((version*1) > asset_version_info.latestVersion) {
-                    console.log('CHECKING FOR NEW ' + manifest + ' ASSETS IN TRUTH VERSION ' + version + '...');
+                    console.log("[[" + server + ']] CHECKING FOR NEW ' + manifest + ' ASSETS IN TRUTH VERSION ' + version + '...');
                     const res = await fetchManifest(version, manifest, server);
                     if (!res) {
                         throw Error('Manifest ' + manifest + ' version ' + version + ' not found!');
@@ -162,7 +156,7 @@ function checkAssetVersions(manifest, versions, server) {
 }
 
 function fetchManifest(truthVersion, manifest, server) {
-    const host = cdnHosts[server];
+    const host = utils.cdnHosts[server];
     let path = '/dl/Resources/' + truthVersion + '/Jpn/AssetBundles/Android/manifest/' + manifest + '_assetmanifest';
     if (manifest === "sound") {
         path = '/dl/Resources/' + truthVersion + '/Jpn/Sound/manifest/sound2manifest';
@@ -182,5 +176,8 @@ function fetchManifest(truthVersion, manifest, server) {
         else {
             return null;
         }
+    }).catch(function(error) {
+        console.log(error);
+        return null;
     });
 }
