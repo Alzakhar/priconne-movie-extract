@@ -7,7 +7,7 @@ const readline = require('readline/promises');
 //const readline = require("readline");
 const process = require('node:process');
 
-const servers = ["jp", "en"]
+
 
 
 async function download(cdnHost, filepath, server) {
