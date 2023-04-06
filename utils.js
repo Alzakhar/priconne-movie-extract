@@ -7,7 +7,7 @@ function parseManifestLine(line) {
         size: lineSplit[3]
     }
 }
-
+const servers = ["en", "jp"]
 const cdnHosts = {
     "en": "assets-priconne-redive-us.akamaized.net",
     "jp": "prd-priconne-redive.akamaized.net"
@@ -21,5 +21,6 @@ const defaultVersion = {
 module.exports = {
 	parseManifestLine,
 	cdnHosts,
-	defaultVersion
+	defaultVersion,
+    servers
 }
