@@ -1,8 +1,10 @@
 Simple movie downloader. 
 
-Because it is simple, it SUCKS. A lot.
+This is built on work by [Andu2](https://github.com/Andu2/priconne-cdn-extract), built on work by [S'pugn](https://github.com/Expugn/priconne-en_db-fetch), which was built on work by [esterTion](https://redive.estertion.win/).
 
-If you do decide to use this, beware that it will lag your computer. Please don't use the all option. 
+This is just a tool to download the USM files from the Priconne CDNs.
+
+Because it is simple, it SUCKS. A lot. If you do decide to use this, beware that it will lag your computer. Please don't use the all option. 
 
 If you want to change the movie manifest, feel free to get it from the server and then rename it as movie2manifest_(server)
 The version here for EN is 10008500 (September 2022) which was the latest one I could find. The one before that was 10008400 and then 10008300 and so on and so forth

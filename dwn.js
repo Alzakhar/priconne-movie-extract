@@ -3,8 +3,7 @@ const path = require('path');
 const https = require('https')
 const utils = require('./utils');
 const readline = require('readline/promises');
-// check if readline/promises provides same functionality as readline
-//const readline = require("readline");
+
 const process = require('node:process');
 
 
