@@ -61,7 +61,13 @@ async function frontEnd(){
   }
   else
   {
-    download(utils.cdnHosts[`${server}`], `movie2manifest_${server}`, `${server}`);
+    if (server === "en"){
+      // Crunchyroll decided to change the name of the movie manifest after v10008500. Oh well.
+      download(utils.cdnHosts[`${server}`], `moviemanifest_${server}`, `${server}`);
+    }
+    else {
+      download(utils.cdnHosts[`${server}`], `movie2manifest_${server}`, `${server}`);
+    }
   }
 };
 frontEnd();
