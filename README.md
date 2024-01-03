@@ -11,4 +11,6 @@ The version here for EN is 10011200 - last modified on Mon, 10 Apr 2023 05:26:00
 JP I think is 10046500, also pretty new.
 
 ~~https://assets-priconne-redive-us.akamaized.net/dl/Resources/10008500/Jpn/Movie/SP/High/manifest/movie2manifest if you want it yourself. The link will probably die on the 30th of April 2023 because of Priconne EN's EOS
-After 10008500, replaced movie2manifest with moviemanifest because Crunchyroll decided to be a asshole.~~ It's dead (for a good 9 months lol)
+After 10008500, replaced movie2manifest with moviemanifest because Crunchyroll decided to be a asshole.~~ It's dead. RIP
+
+Requires NODE.js
